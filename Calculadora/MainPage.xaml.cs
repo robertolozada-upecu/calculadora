@@ -6,108 +6,65 @@ public partial class MainPage : ContentPage
     public MainPage()
     {
         InitializeComponent();
-        OnClear(this, null);
 
     }
 
-    string currentEntry = "";
-    string mathOperator;
-    double firstNumber, secondNumber;
-    public enum State {NoNumbers, FirstNumberOk, OperatorOk, SecondNumberOk};
-    public State currentState = State.NoNumbers;
+    double numeroUno, numeroDos;
+    string operador;
 
-
-
-    void OnSelectNumber(object sender, EventArgs e)
+    void SeleccionarNumero(object sender, EventArgs e)
     {
-
-        Button button = (Button)sender;
-        string pressed = button.Text;
-
-        currentEntry += pressed;
-
-        if ((this.resultText.Text == "0" && pressed == "0")
-            || (currentEntry.Length <= 1 && pressed != "0")
-            || currentState==State.OperatorOk)
+        Button boton = (Button) sender;
+        if (numerosResultado.Text == "0" && numerosResultado.Text.Length == 1 & boton.Text != ".")
         {
-            this.resultText.Text = "";
-            if (currentState == State.OperatorOk)
-                currentState = State.FirstNumberOk;
-        }
-
-        this.resultText.Text += pressed;
-    }
-
-    void OnSelectOperator(object sender, EventArgs e)
-    {
-        if (currentState!=State.OperatorOk)
-            LockNumberValue(resultText.Text);
-        currentState = State.OperatorOk;
-        Button button = (Button)sender;
-        string pressed = button.Text;
-        mathOperator = pressed;
-
-    }
-
-    private void LockNumberValue(string text)
-    {
-        double number = Convert.ToDouble(text);
-        if (currentState==State.NoNumbers)
-        {
-            firstNumber = number;
+            numerosResultado.Text = boton.Text;
         }
         else
         {
-            secondNumber = number;
+            numerosResultado.Text += boton.Text;
         }
-        currentEntry = string.Empty;
+
     }
 
-    void OnClear(object sender, EventArgs e)
+    void LimpiarIngreso(object sender, EventArgs e)
     {
-        firstNumber = 0;
-        secondNumber = 0;
-        currentState = State.NoNumbers;
-        this.resultText.Text = "0";
-        currentEntry = string.Empty;
-        CurrentCalculation.Text = string.Empty;
+        numerosResultado.Text = "0";
+        operacionResultado.Text = "";
+
     }
 
-    void OnCalculate(object sender, EventArgs e)
+    void NumeroNegativo(object sender, EventArgs e)
     {
-        if (currentState==State.FirstNumberOk)
+        if(numerosResultado.Text != "0")
         {
-            if (secondNumber == 0)
-                LockNumberValue(resultText.Text);
-
-            double result = Calculadora.Calculate(firstNumber, secondNumber, mathOperator);
-
-            this.CurrentCalculation.Text = $"{firstNumber} {mathOperator} {secondNumber}";
-
-            this.resultText.Text = result.ToString();
-            firstNumber = result;
-            secondNumber = 0;
-            currentState = State.OperatorOk;
-            currentEntry = string.Empty;
-        }
-    }
-
-    void OnNegative(object sender, EventArgs e)
-    {
-        if (resultText.Text != "0")
-        {
-            LockNumberValue(resultText.Text);
-            if (currentState==State.NoNumbers)
-            {
-                firstNumber *= -1;
-                resultText.Text = firstNumber.ToString();
-            }
+            if (numerosResultado.Text.StartsWith("-"))
+                numerosResultado.Text = numerosResultado.Text.Remove(0, 1);
             else
-            {
-                secondNumber *= -1;
-                resultText.Text = secondNumber.ToString();
-            }
-        }
+                numerosResultado.Text = "-" + numerosResultado.Text;
+        }    
+
+    }
+
+    void SeleccionarOperacion(object sender, EventArgs e)
+    {
+        Button boton = (Button)sender;
+        numeroUno = Convert.ToDouble(numerosResultado.Text);
+        operador = boton.Text;
+        operacionResultado.Text = $"{numeroUno} {operador}";
+        numerosResultado.Text = "";
+    }
+
+    void Calcular(object sender, EventArgs e)
+    {
+        numeroDos = Convert.ToDouble(numerosResultado.Text);
+        double resultado = Calculadora.Calculate(numeroUno, numeroDos, operador);
+        operacionResultado.Text = $"{numeroUno} {operador} {numeroDos} =";
+        numerosResultado.Text = resultado.ToString();
+        numeroUno = resultado;
     }
 }
 
+
+
+
+    
